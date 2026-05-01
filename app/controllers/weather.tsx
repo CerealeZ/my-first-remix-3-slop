@@ -181,36 +181,23 @@ function buildWeatherReportHref(city: string) {
   return `${reportUrl.pathname}${reportUrl.search}`;
 }
 
-function streamWeatherReport(city: string) {
-  let encoder = new TextEncoder();
+async function streamWeatherReport(city: string) {
+  let html: string;
 
-  let stream = new ReadableStream<Uint8Array>({
-    async start(controller) {
-      try {
-        // Emit an immediate chunk so parent streaming can flush the shell early.
-        controller.enqueue(encoder.encode("<!--weather-report-start-->"));
+  try {
+    let report = await loadWeather(city);
+    html = await renderToString(
+      <WeatherReportFrame city={city} report={report} />,
+    );
+  } catch (error) {
+    let message =
+      error instanceof Error ? error.message : "Unable to load weather data.";
+    html = await renderToString(
+      <WeatherReportFrame city={city} error={message} />,
+    );
+  }
 
-        let report = await loadWeather(city);
-        let html = await renderToString(
-          <WeatherReportFrame city={city} report={report} />,
-        );
-        controller.enqueue(encoder.encode(html));
-      } catch (error) {
-        let message =
-          error instanceof Error
-            ? error.message
-            : "Unable to load weather data.";
-        let html = await renderToString(
-          <WeatherReportFrame city={city} error={message} />,
-        );
-        controller.enqueue(encoder.encode(html));
-      } finally {
-        controller.close();
-      }
-    },
-  });
-
-  return new Response(stream, {
+  return new Response(html, {
     headers: {
       "Content-Type": "text/html; charset=utf-8",
       "Cache-Control": "no-store",
