@@ -6,8 +6,9 @@ import { routes } from "../routes.ts";
 import { Layout } from "../ui/layout.tsx";
 import {
   WeatherLoadingPlaceholder,
-  WeatherReportView,
-} from "../ui/weather-app.tsx";
+  WeatherSearchForm,
+} from "../assets/weather-form.tsx";
+import { WeatherReportView } from "../ui/weather-app.tsx";
 import type { WeatherViewModel } from "../utils/weather.ts";
 import { loadWeather } from "../utils/weather.ts";
 import { render } from "../utils/render.tsx";
@@ -42,7 +43,12 @@ function WeatherPage() {
           gap: "24px",
         })}
       >
-        <WeatherShell city={city} />
+        <WeatherShell />
+        <WeatherSearchForm
+          city={city}
+          weatherHref={routes.weather.href()}
+          weatherReportHref={routes.weatherReport.href()}
+        />
         <Frame
           name="weather-report"
           src={buildWeatherReportHref(city)}
@@ -54,93 +60,39 @@ function WeatherPage() {
 }
 
 function WeatherShell() {
-  return ({ city }: { city: string }) => (
-    <>
-      <header
+  return () => (
+    <header
+      mix={css({
+        display: "grid",
+        gap: "8px",
+      })}
+    >
+      <p
         mix={css({
-          display: "grid",
-          gap: "8px",
+          margin: 0,
+          textTransform: "uppercase",
+          letterSpacing: "0.08em",
+          fontSize: "12px",
+          color: "#6b7280",
         })}
       >
-        <p
-          mix={css({
-            margin: 0,
-            textTransform: "uppercase",
-            letterSpacing: "0.08em",
-            fontSize: "12px",
-            color: "#6b7280",
-          })}
-        >
-          Streaming shell example
-        </p>
-        <h1 mix={css({ margin: 0, fontSize: "40px", lineHeight: "1.1" })}>
-          Weather App
-        </h1>
-        <p
-          mix={css({
-            margin: 0,
-            fontSize: "18px",
-            color: "#4b5563",
-            maxWidth: "70ch",
-          })}
-        >
-          Esta ruta envia primero el shell de la pagina y deja que el bloque
-          meteorologico llegue despues por streaming con un placeholder visible.
-        </p>
-      </header>
-
-      <form
-        method="get"
-        action={routes.weather.href()}
+        Streaming shell example
+      </p>
+      <h1 mix={css({ margin: 0, fontSize: "40px", lineHeight: "1.1" })}>
+        Weather App
+      </h1>
+      <p
         mix={css({
-          display: "grid",
-          gridTemplateColumns: "minmax(0, 1fr) auto",
-          gap: "12px",
-          padding: "16px",
-          border: "1px solid #d1d5db",
-          borderRadius: "16px",
-          background: "#f9fafb",
-          "@media (max-width: 720px)": {
-            gridTemplateColumns: "1fr",
-          },
+          margin: 0,
+          fontSize: "18px",
+          color: "#4b5563",
+          maxWidth: "70ch",
         })}
       >
-        <label mix={css({ display: "grid", gap: "8px" })}>
-          <span mix={css({ fontWeight: 700 })}>Ciudad</span>
-          <input
-            type="search"
-            name="city"
-            defaultValue={city}
-            placeholder="Madrid"
-            mix={css({
-              width: "100%",
-              padding: "12px 14px",
-              borderRadius: "12px",
-              border: "1px solid #9ca3af",
-              font: "inherit",
-              background: "#ffffff",
-            })}
-          />
-        </label>
-
-        <button
-          type="submit"
-          mix={css({
-            alignSelf: "end",
-            padding: "12px 18px",
-            border: 0,
-            borderRadius: "12px",
-            background: "#0f766e",
-            color: "#ffffff",
-            font: "inherit",
-            fontWeight: 700,
-            cursor: "pointer",
-          })}
-        >
-          Buscar
-        </button>
-      </form>
-    </>
+        Esta ruta envia primero el shell de la pagina y deja que el bloque
+        meteorologico llegue despues por streaming con un placeholder visible.
+      </p>
+    </header>
   );
 }
 
